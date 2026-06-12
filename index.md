@@ -53,9 +53,13 @@ I built this robotic arm step-by-step using an Arduino Nano microcontroller moun
 To make the arm interactive, I wired up the joystick module that reads physical movements and translates them into motor commands for the arm.
 
 Assembly & Hardware Challenges:
+
 Shield Mounting Issues: Because the new red Nano Shield is shaped differently than the original, I could only securely install one support column to hold it above the base. Trying to use all four columns would press the metal standoffs against the exposed board pins, risking a short circuit.
+
 Damaged Claw Gears: One of the teeth on the claw was unfortunately broken right out of the package. This missing tooth causes the gears to occasionally slip and lose alignment when trying to pick things up.
+
 Weak Gripper Strength: The claw servo does not produce enough torque to tightly clamp down and hold onto objects securely.
+
 Arm Weight Strain: Servo 2 has to lift the entire weight of the upper arm assembly. Because it is under-powered for this load, the arm's upward and downward movements are stuttered rather than smooth.
 
 # Schematics 
