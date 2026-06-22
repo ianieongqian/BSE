@@ -9,11 +9,11 @@ You should comment out all portions of your portfolio that you have not complete
 
 | **Engineer** | **School** | **Area of Interest** | **Grade** |
 |:--:|:--:|:--:|:--:|
-| FirstName LastInitialOnly | School Name | Electrical Engineering | Incoming Senior
+| Ian Q | Cranbrook Schools | Engineering | Incoming Junior
 
 **Replace the BlueStamp logo below with an image of yourself and your completed project. Follow the guide [here](https://tomcam.github.io/least-github-pages/adding-images-github-pages-site.html) if you need help.**
 
-![Headstone Image](logo.svg)
+![Headstone Image](IMG_4521.HEIC)
   
 # Final Milestone
 
@@ -35,11 +35,21 @@ For your final milestone, explain the outcome of your project. Key details to in
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/y3VAmNlER5Y" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-For your second milestone, explain what you've worked on since your previous milestone. You can highlight:
-- Technical details of what you've accomplished and how they contribute to the final goal
-- What has been surprising about the project so far
-- Previous challenges you faced that you overcame
-- What needs to be completed before your final milestone 
+Improving on the original design, I replaced the slow mg90s servo with es08md II, allowing higher torque and precision. The es08md II cartridge is slightly larger than the reserved servo space, so the space had to be sanded. I made the process more efficient by using sand paper attached to an electric drill. As a result of this, servo 2 is now capable of handling the arm’s weight. 
+
+I installed a mpu6050 imu module at the base of the robotic arm, which is able to measure the acceleration of x, y and z. This would detect the pitch and yaw of the base, which the servo would respond accordingly. The imu is plugged in analog port 4 and 5.
+
+As my Arduino IDE has some issue handling the mpu6050 library, the data is sent through the Wire library.
+
+When the imu detects changes in yaw, the arm uses direct angle compensation and returns to the original direction. 
+E.g. when the base turns left 10 degrees, the arm turns right 10 degrees.
+Due to the inaccuracy (signal noise) of the mpu6050, in the initial testing of the code, the arm slowly tilts to one side over time. This is resolved by giving the arm a “deadzone” so that it wouldn’t turn when the change in yaw is negligible.
+
+I have two codes for stabilization - elbow segment stabilization and point stabilization
+
+Elbow segment stabilization uses direct angle compensation to make sure that the angle which the elbow segment points towards remains constant despite changes in pitch. The Arduino obtains the base pitch from the imu, and uses it to obtain the difference between target angle and actual angle. It then uses the difference in angles as the input for servos, so that the elbow segment point in the same angle. After testing, I observed that the elbow adjusts too little, so I added a multiplier of 2.1 (tested value) to the elbow angle.
+
+For point stabilization, when the imu detects changes in pitch, the arm instead uses inverse kinematics. The arm first calculates the distance from the base to the tip of the claw T through the target x and y, and calculates the angle opposite to T via law of cosine and the length of the two arm segments. With that angle, the arm adjusts its servo angle of the elbow, servo 3. The code also calculates the angle of elevation of t, and uses it to compute the servo angle for the shoulder, servo 2. As a result, the arm is able to have its tip at the same spot, regardless of yaw and pitch. As the imu is placed imperfectly in the base of the arm instead of where the shoulder servo is, I added constants “shoulder offset v” and “shoulder offset h”, which is accounted for in calculating actual pitch and yaw. 
 
 # First Milestone
 
