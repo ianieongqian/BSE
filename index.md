@@ -31,9 +31,15 @@ For your final milestone, explain the outcome of your project. Key details to in
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/y3VAmNlER5Y" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-Improving on the original design, I replaced the slow mg90s servo with es08md II, allowing higher torque and precision. The es08md II cartridge is slightly larger than the reserved servo space, so the space had to be sanded. I made the process more efficient by using sand paper attached to an electric drill. As a result of this, servo 2 is now capable of handling the arm’s weight. 
+Improving on the original design, I replaced the slow mg90s servo with es08md II, allowing higher torque and precision. The es08md II cartridge is slightly larger than the reserved servo space, so the space had to be sanded. I made the process more efficient by using sand paper attached to an electric drill. The servo arm provided for the es08md II is also slightly smaller in diameter than the mg90s, so I had to glue to servo arm on the acrylic board. As a result of changing the servo, servo 2 is now capable of handling the arm’s weight. 
+
+![Sanddrill](picture/IMG_4606.jpg)
+
+![Replaceservo](picture/IMG_4607.jpg)
 
 I installed a mpu6050 imu module at the base of the robotic arm, which is able to measure the acceleration of x, y and z. This would detect the pitch and yaw of the base, which the servo would respond accordingly. The imu is plugged in analog port 4 and 5.
+
+![IMU](picture/IMG_4627.jpg)
 
 As my Arduino IDE has some issue handling the mpu6050 library, the data is sent through the Wire library.
 
