@@ -1,5 +1,6 @@
 # Three Joint Robotic Arm with Real-time Stabilization
-By utilizing
+
+The base project is a three joint robotic arm powered by four mg90s servos controlled with a joystick. By utilizing input data from an IMU, the robotic arm is able to achieve active stabilization based on change in pitch and yaw.
 
 | **Engineer** | **School** | **Area of Interest** | **Grade** |
 |:--:|:--:|:--:|:--:|
@@ -73,7 +74,6 @@ Arm Weight Strain: Servo 2 has to lift the entire weight of the upper arm assemb
 ![demonstration](picture/diagrammain.png)
 
 # Code
-Here's where you'll put your code. The syntax below places it into a block of code. Follow the guide [here]([url](https://www.markdownguide.org/extended-syntax/)) to learn how to customize it to your project needs. 
 
 Here is the code for the elbow stabilization:
 
@@ -318,12 +318,15 @@ void loop() {
 ```
 
 # Bill of Materials
-Here's where you'll list the parts in your project. To add more rows, just copy and paste the example rows below.
-Don't forget to place the link of where to buy each component inside the quotation marks in the corresponding row after href =. Follow the guide [here]([url](https://www.markdownguide.org/extended-syntax/)) to learn how to customize this to your project needs. 
 
 | **Part** | **Note** | **Price** | **Link** |
 |:--:|:--:|:--:|:--:|
-| Item Name | What the item is used for | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| Item Name | What the item is used for | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
-| Item Name | What the item is used for | $Price | <a href="https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/"> Link </a> |
+| LK COKOINO Three Joint Robotic Arm| Base Project Robotic Arm | $46.99 | <a href="https://www.amazon.com/LK-COKOINO-Compliment-Engineering-Technology/dp/B081FG1JQ1"> Link </a> |
+| Nano I/O Expansion Sensor Shield | Nano Shield with 3 Pins | $10.99 | <a href="https://www.amazon.com/HiLetgo-Expansion-Sensor-Arduino-Duemilanove/dp/B07VQRCC8F"> Link </a> |
+| Schrewdriver Set | Assembly | $6.39 | <a href="https://www.amazon.com/Small-Screwdriver-Set-Mini-Magnetic/dp/B08RYXKJW9/"> Link </a> |
+| Electronic Components | Testing | $14.99 | <a href="https://www.amazon.com/Smraza-Electronics-Potentiometer-tie-Points-Breadboard/dp/B0B62RL725"> Link </a> |
+| 9V Battery | Power Source | $12.69 | <a href="https://www.amazon.com/dp/B00MH4QM1S"> Link </a> |
+| 9V Battery Connector | Power Cord | $5.99 | <a href="https://www.amazon.com/DZS-Elec-Connector-Experimental-5-5x2-1mm/dp/B07FDS11ZY"> Link </a> |
+| ES08MD II Servo | Servo Replacement | $16.33 | <a href="https://www.amazon.com/ES08MD-Metal-Digital-Servo-Plastic/dp/B0CKRYK1RG"> Link </a> |
+| MPU6050 | IMU | $11.79 | <a href="https://www.amazon.com/HiLetgo-MPU-6050-Accelerometer-Gyroscope-Converter/dp/B00LP25V1A?th=1"> Link </a> |
 
