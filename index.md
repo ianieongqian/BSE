@@ -79,16 +79,245 @@ Here's where you'll put images of your schematics. [Tinkercad](https://www.tinke
 # Code
 Here's where you'll put your code. The syntax below places it into a block of code. Follow the guide [here]([url](https://www.markdownguide.org/extended-syntax/)) to learn how to customize it to your project needs. 
 
+Here is the code for the elbow stabilization:
+
 ```c++
+#include <Wire.h>
+#include <Servo.h>
+#include <math.h>
+
+const int MPU_ADDR = 0x68; 
+
+Servo baseServo;     // pin 4
+Servo shoulderServo; // pin 5
+Servo elbowServo;    // pin 9
+float basePitch = 0.0;
+float baseYaw   = 0.0;
+unsigned long lastTime;
+// set the exact angle you want each joint to hold when the sensor is flat
+const int RESTING_SHOULDER_DEG = 90; 
+const int RESTING_ELBOW_DEG    = 150; 
+
 void setup() {
-  // put your setup code here, to run once:
+  Wire.begin();
   Serial.begin(9600);
-  Serial.println("Hello World!");
+  // start mpu6050
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x6B); 
+  Wire.write(0);    
+  Wire.endTransmission();
+  // assign Pin
+  baseServo.attach(4);
+  shoulderServo.attach(5); 
+  elbowServo.attach(9);    
+  lastTime = millis();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  //record change in time (dt) for acceleration
+  unsigned long currentTime = millis();
+  float dt = (currentTime - lastTime) / 1000.0;
+  lastTime = currentTime;
 
+  //request data from imu
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x3B); 
+  Wire.endTransmission(false);
+  Wire.requestFrom(MPU_ADDR, 14, true);
+
+  //obtain data from imu
+  //communication bus can only send 8 bits but the accelerometer readings are 16 bit signed int
+  //the code reads the first byte (the "high" part) and uses << 8 to shift its bits 8 spaces to the left, creating room on the right of zeros
+  //it then uses the or operator to slot the second byte directly into that empty space, merging them into a single signed integer (int16_t)
+
+  int16_t ax = (Wire.read() << 8) | Wire.read();
+  int16_t ay = (Wire.read() << 8) | Wire.read();
+  int16_t az = (Wire.read() << 8) | Wire.read();
+  Wire.read(); Wire.read(); // Skip temp bytes
+  int16_t gx = (Wire.read() << 8) | Wire.read();
+  int16_t gy = (Wire.read() << 8) | Wire.read();
+  int16_t gz = (Wire.read() << 8) | Wire.read();
+
+  // process pitch and yaw
+  float accelPitch = atan2(ay, az) * 180.0 / M_PI;//use trig to calculate the pitch angle using the accelerometer y and z axes, then converts the result from radians to degrees
+  float gyroXRate = gx / 131.0;  //converts the raw gyroscope data into degrees per second - pitch
+  //131.0 is a scale factor from the mpu6050 datasheet based on its default sensitivity setting
+  float gyroZRate = gz / 131.0; //yaw
+
+  basePitch = 0.98 * (basePitch + gyroXRate * dt) + 0.02 * accelPitch;
+  
+  // yaw deadzone
+  if (abs(gyroZRate) < 3.0) { 
+    gyroZRate = 0.0; 
+  }
+  baseYaw += gyroZRate * dt; 
+  int shoulderDynamicAdjust = basePitch; 
+  // multiply the pitch to make the elbow move more aggressively and with more extension. 
+  // 2.1 means it will move 110% further than before. This value is obtained after trying different values.
+  float elbowMultiplier = 2.1; 
+  int elbowDynamicAdjust = basePitch * elbowMultiplier; 
+  // calculate adjust angles
+  int shoulderServoDeg = RESTING_SHOULDER_DEG - shoulderDynamicAdjust;
+  int elbowServoDeg    = RESTING_ELBOW_DEG + elbowDynamicAdjust; 
+  int baseServoDeg     = 90 - baseYaw;
+  // shoulder degrees had to be inversed due to structural placement
+  shoulderServoDeg = 180 - shoulderServoDeg; 
+  // safety limit for each servo
+  baseServoDeg     = constrain(baseServoDeg, 10, 170);
+  shoulderServoDeg = constrain(shoulderServoDeg, 15, 165);
+  elbowServoDeg    = constrain(elbowServoDeg, 15, 165);
+  // for testing: Print angle data in monitor
+  Serial.print("IMU Pitch: "); Serial.print(basePitch);
+  Serial.print(" | Shoulder: "); Serial.print(shoulderServoDeg);
+  Serial.print(" | Elbow: "); Serial.println(elbowServoDeg);
+  // write the result to servos
+  baseServo.write(baseServoDeg);
+  shoulderServo.write(shoulderServoDeg);
+  elbowServo.write(elbowServoDeg);
+
+  delay(15);
+}
+```
+
+Here is the code for the point stabilization:
+
+```c++
+#include <Wire.h>
+#include <Servo.h>
+#include <math.h>
+
+const int MPU_ADDR = 0x68; 
+
+const float L1 = 60.0;                 
+const float L2 = 90.0;                 
+const float SHOULDER_OFFSET_V = 110.0;  // offset of imu in length
+const float SHOULDER_OFFSET_H = 90.0;  // offset of imu in height
+
+const float TARGET_X = 100.0;          
+const float TARGET_Y = 100.0;           
+
+Servo baseServo;     // Pin 4
+Servo shoulderServo; // Pin 5
+Servo elbowServo;    // Pin 9
+float basePitch = 0.0;
+float baseYaw   = 0.0;
+unsigned long lastTime;
+
+void setup() {
+  Wire.begin();
+  Serial.begin(9600);
+
+  // start mpu6050
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x6B); 
+  Wire.write(0);    
+  Wire.endTransmission();
+
+  // assign pin
+  baseServo.attach(4);
+  shoulderServo.attach(5); 
+  elbowServo.attach(9);    
+
+  lastTime = millis();
+}
+
+void loop() {
+  //record change in time (dt) for acceleration
+  unsigned long currentTime = millis();
+  float dt = (currentTime - lastTime) / 1000.0;
+  lastTime = currentTime;
+
+  //request data from imu
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x3B); 
+  Wire.endTransmission(false);
+  Wire.requestFrom(MPU_ADDR, 14, true);
+
+  //obtain data from imu
+  //communication bus can only send 8 bits but the accelerometer readings are 16 bit signed int
+  //the code reads the first byte (the "high" part) and uses << 8 to shift its bits 8 spaces to the left, creating room on the right of zeros
+  //it then uses the or operator to slot the second byte directly into that empty space, merging them into a single signed integer (int16_t)
+  int16_t ax = (Wire.read() << 8) | Wire.read();
+  int16_t ay = (Wire.read() << 8) | Wire.read();
+  int16_t az = (Wire.read() << 8) | Wire.read();
+  Wire.read(); Wire.read(); // Skip temperature bytes
+  int16_t gx = (Wire.read() << 8) | Wire.read();
+  int16_t gy = (Wire.read() << 8) | Wire.read();
+  int16_t gz = (Wire.read() << 8) | Wire.read();
+
+  // process pitch and yaw
+  float accelPitch = atan2(ay, az) * 180.0 / M_PI;//use trig to calculate the pitch angle using the accelerometer y and z axes, then converts the result from radians to degrees
+  float gyroXRate = gx / 131.0;  //converts the raw gyroscope data into degrees per second - pitch
+  //131.0 is a scale factor from the mpu6050 datasheet based on its default sensitivity setting
+  float gyroZRate = gz / 131.0; //yaw
+
+  basePitch = 0.98 * (basePitch + gyroXRate * dt) + 0.02 * accelPitch;
+  
+  // deadzone for yaw
+  if (abs(gyroZRate) < 3.0) { 
+    gyroZRate = 0.0; 
+  }
+  baseYaw += gyroZRate * dt; 
+
+  float pitchRad = basePitch * M_PI / 180.0;//convert to radians for trig
+  float absPitchRad = abs(basePitch) * M_PI / 180.0;//convert absolute pitch to radians
+
+  // Vertical structural tracking
+  float vertShiftX = SHOULDER_OFFSET_V * sin(pitchRad);
+  float vertShiftY = SHOULDER_OFFSET_V * cos(pitchRad);
+
+  // Absolute horizontal tracking to handle cross-zero pitch transitions
+  float horizShiftX = SHOULDER_OFFSET_H * (1.0 - cos(absPitchRad));
+  float horizShiftY = SHOULDER_OFFSET_H * sin(absPitchRad);
+
+  // Symmetrical vector combination
+  float totalShoulderShiftX = vertShiftX + horizShiftX;
+  float totalShoulderShiftY = (SHOULDER_OFFSET_V - vertShiftY) + horizShiftY; 
+
+  // Compute final modified target coordinates
+  float modifiedX = TARGET_X - totalShoulderShiftX; 
+  float modifiedY = TARGET_Y - totalShoulderShiftY; 
+
+  // Distance from shoulder joint to targeted point
+  float T = sqrt(modifiedX * modifiedX + modifiedY * modifiedY);
+
+  // law of cosine to obtain internal angle of two arm segments
+  float cosElbow = (L1 * L1 + L2 * L2 - T * T) / (2.0 * L1 * L2);
+  cosElbow = constrain(cosElbow, -1.0, 1.0); // limit domain for arccos
+  float elbowRad = acos(cosElbow);
+  
+  float cosShoulderInternal = (L1 * L1 + T * T - L2 * L2) / (2.0 * L1 * T);
+  cosShoulderInternal = constrain(cosShoulderInternal, -1.0, 1.0);//limit domain for arcsin
+  float shoulderInternalRad = acos(cosShoulderInternal);
+  
+  float angleToTargetRad = atan2(modifiedY, modifiedX); //the angle of elevation of t
+
+  float shoulderAngleRad = angleToTargetRad + shoulderInternalRad;
+  float elbowAngleRad    = elbowRad; 
+
+  // convert angles to degrees
+  int shoulderServoDeg = shoulderAngleRad * 180.0 / M_PI;
+  int elbowServoDeg    = elbowAngleRad * 180.0 / M_PI;
+  int baseServoDeg     = 90 - baseYaw; 
+
+  shoulderServoDeg = 180 - shoulderServoDeg; // Inverted to match frame mounting
+  // Elbow inversion removed to fix over-rotation bug
+
+  // constraints to prevent mechanical binding or striking horns
+  baseServoDeg     = constrain(baseServoDeg, 10, 170);
+  shoulderServoDeg = constrain(shoulderServoDeg, 15, 165);
+  elbowServoDeg    = constrain(elbowServoDeg, 30, 150);
+
+  // output angles for debug
+  Serial.print("S-Angle: "); Serial.print(shoulderServoDeg);
+  Serial.print(" | E-Angle: "); Serial.println(elbowServoDeg);
+
+  // write commands to hardware
+  baseServo.write(baseServoDeg);
+  shoulderServo.write(shoulderServoDeg);
+  elbowServo.write(elbowServoDeg);
+
+  delay(15); 
 }
 ```
 
