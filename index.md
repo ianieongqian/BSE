@@ -1,4 +1,4 @@
-# Project Name Here
+# Three Joint Robotic Arm with Real-time Stabilization
 Replace this text with a brief description (2-3 sentences) of your project. This description should draw the reader in and make them interested in what you've built. You can include what the biggest challenges, takeaways, and triumphs from completing the project were. As you complete your portfolio, remember your audience is less familiar than you are with all that your project entails!
 
 You should comment out all portions of your portfolio that you have not completed yet, as well as any instructions:
@@ -10,10 +10,6 @@ You should comment out all portions of your portfolio that you have not complete
 | **Engineer** | **School** | **Area of Interest** | **Grade** |
 |:--:|:--:|:--:|:--:|
 | Ian Q | Cranbrook Schools | Engineering | Incoming Junior
-
-**Replace the BlueStamp logo below with an image of yourself and your completed project. Follow the guide [here](https://tomcam.github.io/least-github-pages/adding-images-github-pages-site.html) if you need help.**
-
-![Headstone Image](picture/IMG_4521.jpg)
   
 # Final Milestone
 
@@ -57,8 +53,11 @@ For point stabilization, when the imu detects changes in pitch, the arm instead 
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/CaCazFBhYKs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
+![Milestone1](picture/IMG_4531.jpg)
 
 I built this robotic arm step-by-step using an Arduino Nano microcontroller mounted on top of a Nano Shield, which handles the 9V battery needed to power the four motors. Before assembling any of the physical structure, I ran a calibration sketch to force all the servos to exactly 90 degrees. This allowed me to screw the plastic frame pieces on straight, ensuring the arm has an accurate center position.
+
+![Joystickconnect](picture/IMG_4522.jpg)
 
 To make the arm interactive, I wired up the joystick module that reads physical movements and translates them into motor commands for the arm.
 
