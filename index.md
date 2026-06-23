@@ -67,6 +67,8 @@ Shield Mounting Issues: Because the new red Nano Shield is shaped differently th
 
 Damaged Claw Gears: One of the teeth on the claw was unfortunately broken right out of the package. This missing tooth causes the gears to occasionally slip and lose alignment when trying to pick things up.
 
+![Clawdamage](picture/IMG_4539.jpg)
+
 Weak Gripper Strength: The claw servo does not produce enough torque to tightly clamp down and hold onto objects securely.
 
 Arm Weight Strain: Servo 2 has to lift the entire weight of the upper arm assembly. Because it is under-powered for this load, the arm's upward and downward movements are stuttered rather than smooth.
