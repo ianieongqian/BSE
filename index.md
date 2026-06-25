@@ -5,6 +5,8 @@ The base project is a three joint robotic arm powered by four mg90s servos contr
 | **Engineer** | **School** | **Area of Interest** | **Grade** |
 |:--:|:--:|:--:|:--:|
 | Ian Q | Cranbrook Schools | Engineering | Incoming Junior
+
+![Headstone](picture/IMG_4718.png)
   
 # Final Milestone
 
