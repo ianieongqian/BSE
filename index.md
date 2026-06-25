@@ -12,6 +12,8 @@ The base project is a three joint robotic arm powered by four mg90s servos contr
 
 I finalized the portfolio page and included the schematics of the robotic arm. The schematics diagram is created in Fritzing, as I was able to find ready to use resource for the Nano shield online. 
 
+![schematics](picture/schematicgraph.png)
+
 I also tuned the constants within the code, so that it could make more accurate stabilization. 
 
 # Second Milestone
